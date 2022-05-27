@@ -10,6 +10,16 @@ internal class Subject
     public string EmployeeStatus = "Termminated";
   }
 ```
+### Data structure Array class
+```
+ internal class Subject
+  {
+    public string[] EmployeeName = { "aceng" };
+    public int[] EmployeeId = { 2 };
+    public string[] EmployeeCity = { "Boston" };
+    public string[] EmployeeStatus = { "Termminated" };
+  }
+```
 ### Using Newtonsoft Library and Declare the file path
 ```
 using Newtonsoft.Json;
@@ -70,6 +80,63 @@ private void WriteJSON()
     }
 }
 ```
+### Deserialize (Read) Array JSON file and insert into DataGridView
+```
+private void Readjson()
+  {
+      string jsonString = File.ReadAllText(path);
+      //Array Mode
+      var jsobject = JObject.Parse(jsonString);
+      JArray item = (JArray)jsobject["EmployeeName"];
+      dataGridView1.Rows.Clear();
+
+      for(int i = 0; i < item.Count; i++)
+      {
+          dataGridView1.Rows.Add(jsobject["EmployeeName"][i], jsobject["EmployeeId"][i], jsobject["EmployeeCity"][i], jsobject["EmployeeStatus"][i]);    
+      }
+  }
+```
+### Serialize (Write) Array JSON file from DataGridView
+```
+private void Updatejson()
+{
+    List<string> name = new List<string>();
+    List<int> id = new List<int>();
+    List<string> city = new List<string>();
+    List<string> status = new List<string>();
+
+    for(int i = 0; i<dataGridView1.Rows.Count-1; i++)
+    {
+        name.Add(dataGridView1.Rows[i].Cells[0].Value.ToString());
+        id.Add(Convert.ToInt32(dataGridView1.Rows[i].Cells[1].Value));
+        city.Add(dataGridView1.Rows[i].Cells[2].Value.ToString());
+        status.Add(dataGridView1.Rows[i].Cells[3].Value.ToString());
+    }
+    Datasub.EmployeeName = name.ToArray();
+    Datasub.EmployeeId =id.ToArray();
+    Datasub.EmployeeCity = city.ToArray();
+    Datasub.EmployeeStatus= status.ToArray();
+
+    string result = JsonConvert.SerializeObject(Datasub);
+    if (File.Exists(path))
+    {
+        File.Delete(path);
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+    else if (!File.Exists(path))
+    {
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+}
+```
 ### Clear or nullify all key in JSON file
 ```
 using Newtonsoft.Json;
@@ -87,6 +154,47 @@ using System.IO;
     string result = JsonConvert.SerializeObject(Datasub);
     
     //Using StreamWriter to modify the JSON key in file
+    if (File.Exists(path))
+    {
+        File.Delete(path);
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+    else if (!File.Exists(path))
+    {
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+}
+```
+### Clear or Nullify Array in JSON file
+```
+private void Clearjson()
+{
+    string jsonString = File.ReadAllText(path);
+    var jsobject = JObject.Parse(jsonString);
+    JArray item = (JArray)jsobject["EmployeeName"];
+
+    //Array Mode
+    List<string> stringlist = new List<string>();
+    List<int> intlist = new List<int>();
+    for (int j = 0; j < item.Count; j++)
+    {
+        intlist.Add(0);
+        stringlist.Add("");
+    }
+    Datasub.EmployeeName = stringlist.ToArray();
+    Datasub.EmployeeId = intlist.ToArray();
+    Datasub.EmployeeCity = stringlist.ToArray();
+    Datasub.EmployeeStatus = stringlist.ToArray();
+    string result = JsonConvert.SerializeObject(Datasub);
+
     if (File.Exists(path))
     {
         File.Delete(path);
