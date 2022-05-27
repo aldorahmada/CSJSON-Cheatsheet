@@ -1,4 +1,3 @@
-# JSON Cheatsheet
 ## JSON to Datagridview
 ### Data structure class
 ```
@@ -195,6 +194,52 @@ private void Clearjson()
     Datasub.EmployeeStatus = stringlist.ToArray();
     string result = JsonConvert.SerializeObject(Datasub);
 
+    if (File.Exists(path))
+    {
+        File.Delete(path);
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+    else if (!File.Exists(path))
+    {
+        using (var tw = new StreamWriter(path, true))
+        {
+            tw.WriteLine(result.ToString());
+            tw.Close();
+        }
+    }
+}
+```
+## JSON to Object
+### Deserialize (Read) Single Row JSON file to label
+```
+private void ReadRowJSON(int i)
+{
+    string jsonString = File.ReadAllText(path);
+    var jsobject = JObject.Parse(jsonString);
+    label5.Text = jsobject["EmployeeName"][i].ToString();
+    label6.Text = jsobject["EmployeeId"][i].ToString();
+    label7.Text = jsobject["EmployeeCity"][i].ToString();
+    label8.Text = jsobject["EmployeeStatus"][i].ToString();
+    label9.Text = i.ToString();
+}
+```
+### Serialize (Write) Single Row JSON file from TextBox
+```
+private void WriteRowJSON()
+{
+    int i = Convert.ToInt32(label9.Text);
+    string jsonString = File.ReadAllText(path);
+    Subject databaseread = JsonConvert.DeserializeObject<Subject>(jsonString);
+    databaseread.EmployeeName[i] = textBox1.Text;
+    databaseread.EmployeeId[i] = Convert.ToInt32(textBox2.Text);
+    databaseread.EmployeeCity[i] = textBox3.Text;
+    databaseread.EmployeeStatus[i] = textBox4.Text;
+
+    string result = JsonConvert.SerializeObject(databaseread);
     if (File.Exists(path))
     {
         File.Delete(path);
